@@ -12,9 +12,6 @@ export async function openBrowser(): Promise<puppeteer.Browser> {
       height: 1080
     },
     headless: true,
-    executablePath: existsSync('/usr/bin/chromium-browser')
-      ? '/usr/bin/chromium-browser'
-      : '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     args: [
       '--disable-dev-shm-usage',
       '--no-sandbox',
