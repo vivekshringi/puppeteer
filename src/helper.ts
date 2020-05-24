@@ -1,25 +1,21 @@
-import puppeteer, { ElementHandle } from 'puppeteer';
+import puppeteer, { ElementHandle } from "puppeteer";
 export let ENV_URL = "https://the-internet.herokuapp.com/";
-
-export async function wait(timeout: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, timeout));
-}
 
 export async function openBrowser(): Promise<puppeteer.Browser> {
   return puppeteer.launch({
     defaultViewport: {
       width: 1920,
-      height: 1080
+      height: 1080,
     },
     headless: true,
     args: [
-      '--disable-dev-shm-usage',
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-gpu',
-      '--disable-translate',
-      '--disable-extensions'
-    ]
+      "--disable-dev-shm-usage",
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-gpu",
+      "--disable-translate",
+      "--disable-extensions",
+    ],
   });
 }
 
@@ -31,7 +27,7 @@ export async function openPage(
   await page.setCacheEnabled(false);
   page.setDefaultTimeout(20000);
   await page.goto(ENV_URL, {
-    waitUntil: 'networkidle2'
+    waitUntil: "networkidle2",
   });
   return page;
 }
@@ -44,7 +40,7 @@ export async function textBySelector(
   if (!element) {
     throw new Error(`No element at '${selector}' found`);
   }
-  const text = await (await element.getProperty('textContent')).jsonValue();
+  const text = await (await element.getProperty("textContent")).jsonValue();
   return String(text);
 }
 
