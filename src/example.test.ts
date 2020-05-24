@@ -3,23 +3,24 @@ import {
   openBrowser,
   openPage,
   textBySelector,
-} from '../helper';
+} from './helper';
 
 let browser: puppeteer.Browser;
 let page: puppeteer.Page;
 const pageName = '/';
+let viewport = {
+  width: 1280,
+  height: 980,
+  deviceScaleFactor: 1
+}
 
-beforeEach(async () => {
+beforeAll(async () => {
   browser = await openBrowser();
   page = await openPage(browser, pageName);
-  await page.setViewport({
-    width: 1280,
-    height: 980,
-    deviceScaleFactor: 1
-  });
+  await page.setViewport(viewport);
 });
 
-afterEach(async () => {
+afterAll(async () => {
   if (browser) {
     browser.close();
   }
@@ -35,8 +36,20 @@ test('check if basic authentication works', async () => {
   await page.setExtraHTTPHeaders({
     Authorization: `Basic ${Buffer.from('admin:admin').toString('base64')}`
   });
+  debugger;
   await page.goto((await page.url())+'/basic_auth')
   const successMessage = await textBySelector(page, '.example p');
   expect(successMessage.trim()).toEqual("Congratulations! You must have the proper credentials.")
 })
+
+test('check if window width and height is correct on opening', async () => {
+  const dimensions = await page.evaluate(() => {
+    return {
+      width: document.documentElement.clientWidth,
+      height: document.documentElement.clientHeight,
+      deviceScaleFactor: window.devicePixelRatio
+    };
+  });
+   expect(dimensions).toEqual(viewport);
+});
 });

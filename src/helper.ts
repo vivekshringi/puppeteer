@@ -1,5 +1,5 @@
-import { existsSync } from 'fs';
 import puppeteer, { ElementHandle } from 'puppeteer';
+export let ENV_URL = "https://the-internet.herokuapp.com/";
 
 export async function wait(timeout: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, timeout));
@@ -29,12 +29,8 @@ export async function openPage(
 ): Promise<puppeteer.Page> {
   const page = (await browser.pages())[0];
   await page.setCacheEnabled(false);
-  page.setDefaultTimeout(10000);
-  // todo: user and pass are hardcoded here -> should be aligned with the basic auth lambda@edge
-  // await page.setExtraHTTPHeaders({
-   //  Authorization: `Basic ${Buffer.from('user:pass').toString('base64')}`
-  // });
-  await page.goto("https://the-internet.herokuapp.com/", {
+  page.setDefaultTimeout(20000);
+  await page.goto(ENV_URL, {
     waitUntil: 'networkidle2'
   });
   return page;
