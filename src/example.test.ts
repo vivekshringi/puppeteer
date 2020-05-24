@@ -14,13 +14,13 @@ let viewport = {
   deviceScaleFactor: 1
 }
 
-beforeAll(async () => {
+beforeEach(async () => {
   browser = await openBrowser();
   page = await openPage(browser, pageName);
   await page.setViewport(viewport);
 });
 
-afterAll(async () => {
+afterEach(async () => {
   if (browser) {
     browser.close();
   }
@@ -36,7 +36,14 @@ test('check if basic authentication works', async () => {
   await page.setExtraHTTPHeaders({
     Authorization: `Basic ${Buffer.from('admin:admin').toString('base64')}`
   });
-  debugger;
+  await page.goto((await page.url())+'/basic_auth')
+  const successMessage = await textBySelector(page, '.example p');
+  expect(successMessage.trim()).toEqual("Congratulations! You must have the proper credentials.")
+})
+
+test('check if basic authentication works using page.authenticate  ', async () => {
+  await page.authenticate({username:"admin",
+password:"admin"});
   await page.goto((await page.url())+'/basic_auth')
   const successMessage = await textBySelector(page, '.example p');
   expect(successMessage.trim()).toEqual("Congratulations! You must have the proper credentials.")

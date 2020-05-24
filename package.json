@@ -15,7 +15,8 @@
     "typescript": "^3.9.3"
   },
   "scripts": {
-    "test": "jest --color"
+    "test": "jest --color",
+    "test-event":"jest event.test --color"
   },
   "jest": {
     "cacheDirectory": "node_modules/.jest-cache",
