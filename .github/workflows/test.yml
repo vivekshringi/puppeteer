@@ -1,5 +1,4 @@
 name: puppeteer run
-
 on:
   pull_request:
     branches:

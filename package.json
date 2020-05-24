@@ -6,11 +6,8 @@
   "dependencies": {
     "@types/jest": "^25.2.3",
     "@types/puppeteer": "^3.0.0",
-    "@types/puppeteer-core": "^1.9.0",
     "jest": "^26.0.1",
-    "jest-puppeteer": "^4.4.0",
     "puppeteer": "^3.1.0",
-    "puppeteer-core": "^3.1.0",
     "ts-jest": "^26.0.0",
     "typescript": "^3.9.3"
   },

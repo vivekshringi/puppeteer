@@ -22,6 +22,7 @@ describe("Scenarios to test events", () => {
     page = await browser.newPage();
     await page.goto("https://the-internet.herokuapp.com/");
     const allPages = await browser.pages();
+    await allPages[1].screenshot({path:'test.jpg'})
     expect(allPages.length).toEqual(2);
   });
 
@@ -87,7 +88,7 @@ describe("Scenarios to test events", () => {
     expect(await textBySelector(page,'#result')).toContain('Hello');
   });
 
-  test("Verify confirming the js prompt message ", async () => {
+  test.skip("Verify confirming the js prompt message ", async () => {
     let dialogPromptFlag = false;
     const page = (await browser.pages())[0];
     page.on("request", (result)=>console.info('request is made '+ result.url()));
