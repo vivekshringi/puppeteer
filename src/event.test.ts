@@ -89,7 +89,7 @@ describe("Scenarios to test events", () => {
   });
 });
 
-describe.only("All event based scenarios", () => {
+describe("All event based scenarios", () => {
   test("Verify the close event", async () => {
     let page = (await browser.pages())[0];
     let pageIsClosed = false;
