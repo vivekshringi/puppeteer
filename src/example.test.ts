@@ -98,4 +98,28 @@ describe.only("Example Test Scenarios", () => {
     const json = await text.jsonValue();
     console.log(json);
   });
+
+  test("check if adding script tag works", async () => {
+    var projectDir = process.env.PWD;
+    await page.goto(`file:///${projectDir}/src/1.html`);
+    await page.addScriptTag({
+      content:"document.getElementById(\"demo\").innerHTML =\"I Love You\";"
+    })
+    const headline = await page.$eval('h1', element => element.textContent);
+    expect(headline).toEqual('I Love You');
+   });
+
+   test("check if adding style works", async () => {
+    var projectDir = process.env.PWD;
+    await page.goto(`file:///${projectDir}/src/1.html`);
+    await page.addStyleTag({
+      url:`file:///${projectDir}/src/1.css`
+    })
+    const styleObject = await page.evaluate(
+      () => {
+        const headline:any = document.querySelector('h1');
+        return JSON.parse(JSON.stringify(getComputedStyle(headline)));
+      });
+    expect(styleObject.fontSize).toEqual('25px');
+   });
 });
