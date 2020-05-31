@@ -59,4 +59,15 @@ test('check if window width and height is correct on opening', async () => {
   });
    expect(dimensions).toEqual(viewport);
 });
+
+test('check $ selector use', async () => {
+  await page.goto('https://the-internet.herokuapp.com')
+  const elementHandle = await page.$('h1');
+  const propertyDetails = await elementHandle?.getProperty('innerText');
+  const location = await elementHandle?.boundingBox();
+  await elementHandle?.screenshot({'path':'hello.jpg'});
+  const innerText = await propertyDetails?.jsonValue()
+  expect(innerText).toEqual('Welcome to the-internet')
+  expect(location).toEqual({ x: 155, y: 40.796875, width: 970, height: 61 });
+});
 });
