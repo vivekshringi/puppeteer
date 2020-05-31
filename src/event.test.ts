@@ -8,7 +8,7 @@ let targetCreatedFlag = false;
 let targetDestroyedFlag = false;
 
 beforeEach(async () => {
-  browser = await puppeteer.launch();
+  browser = await puppeteer.launch({ headless: true });
 });
 
 afterEach(async () => {
@@ -22,7 +22,7 @@ describe("Scenarios to test events", () => {
     page = await browser.newPage();
     await page.goto("https://the-internet.herokuapp.com/");
     const allPages = await browser.pages();
-    await allPages[1].screenshot({path:'test.jpg'})
+    await allPages[1].screenshot({ path: "test.jpg" });
     expect(allPages.length).toEqual(2);
   });
 
@@ -42,8 +42,8 @@ describe("Scenarios to test events", () => {
     page.on("dialog", (dialog) => {
       dialogFlag = true;
       dialog.accept();
-      expect(dialog.type()).toEqual('alert');
-      expect(dialog.message()).toEqual('I am a JS Alert');
+      expect(dialog.type()).toEqual("alert");
+      expect(dialog.message()).toEqual("I am a JS Alert");
     });
     await page.goto("https://the-internet.herokuapp.com/javascript_alerts");
     await page.click("button[onclick='jsAlert()']");
@@ -78,23 +78,104 @@ describe("Scenarios to test events", () => {
     let dialogPromptFlag = false;
     const page = (await browser.pages())[0];
     page.on("dialog", async (dialog) => {
-      await dialog.accept('Hello').then(()=>(dialogPromptFlag=true));
+      await dialog.accept("Hello").then(() => (dialogPromptFlag = true));
       expect(dialog.type()).toEqual("prompt");
       expect(dialog.message()).toEqual("I am a JS prompt");
     });
     await page.goto("https://the-internet.herokuapp.com/javascript_alerts");
     await page.click("button[onclick='jsPrompt()']");
     expect(dialogPromptFlag).toBeTruthy();
-    expect(await textBySelector(page,'#result')).toContain('Hello');
+    expect(await textBySelector(page, "#result")).toContain("Hello");
+  });
+});
+
+describe.only("All event based scenarios", () => {
+  test("Verify the close event", async () => {
+    let page = (await browser.pages())[0];
+    let pageIsClosed = false;
+    page.on("close", (result) => {
+      pageIsClosed = true;
+    });
+    await page.close();
+    expect(pageIsClosed).toBeTruthy();
   });
 
-  test.skip("Verify confirming the js prompt message ", async () => {
-    let dialogPromptFlag = false;
-    const page = (await browser.pages())[0];
-    page.on("request", (result)=>console.info('request is made '+ result.url()));
-    page.on('requestfailed', (result)=>console.info('request is failed'+ result.url()));
-    page.on('requestfinished' ,(result)=>console.info('request is finished'+ result));
-    page.on('response',(result)=>console.info('response is received'+ result.status()));
-    await page.goto("https://the-internet.herokuapp.com/broken_images");
+  test("Verify the console event", async () => {
+    let consoleflag = false;
+    let page = (await browser.pages())[0];
+    page.on("console", (msg) => {
+      consoleflag = true;
+      for (let i = 0; i < msg.args().length; ++i)
+        console.log(`${i}: ${msg.args()[i]}`);
+    });
+    await page.goto("https://the-internet.herokuapp.com/");
+    //This is to check that you can trigger console message using puppeteer
+    await page.evaluate(() => console.log(5 + 3));
+    //This is to find element in DOM
+    await page.evaluate(() => console.log(document.querySelector("h1")));
+    expect(consoleflag).toBeTruthy();
   });
+
+  test("Verify the domcontent is loaded", async () => {
+    let page = (await browser.pages())[0];
+    let domISLoaded = false;
+    page.on("domcontentloaded", (result) => {
+      domISLoaded = true;
+    });
+    await page.goto("https://the-internet.herokuapp.com/", {
+      waitUntil: "domcontentloaded",
+    });
+    expect(domISLoaded).toBeTruthy();
+  });
+
+  test("Verify tracking page error event", async () => {
+    let page = (await browser.pages())[0];
+    page.once("pageerror", (result) => {
+      expect(result.name).toEqual("Error");
+      expect(result.message).toContain(
+        "TypeError: Cannot read property 'xyz' of undefined"
+      );
+    });
+    await page.goto("https://the-internet.herokuapp.com/javascript_error", {
+      waitUntil: "networkidle0",
+    });
+  });
+
+  test("Verify tracking requests and responses", async () => {
+    let page = (await browser.pages())[0];
+    page.once("request", (request: any) => {
+      console.log(request);
+    });
+
+    page.once("response", (response: any) => {
+      console.log(response);
+    });
+    await page.goto("https://the-internet.herokuapp.com/status_codes/200", {
+      waitUntil: "networkidle0",
+    });
+  });
+
+  test("Verify tracking finished request", async () => {
+    let page = (await browser.pages())[0];
+    page.once("requestfinished", (request) => {
+      console.log("request finished");
+      console.log(request);
+    });
+    await page.goto("https://the-internet.herokuapp.com/asdf.jpg", {
+      waitUntil: "networkidle0",
+    });
+  });
+
+  test("Verify tracking if frameattached request", async () => {
+    let page = (await browser.pages())[0];
+    page.on("frameattached", (result) => {
+      console.log("frame is attached");
+      console.log(result.parentFrame());
+      console.log(result.childFrames());
+    });
+    await page.goto("https://the-internet.herokuapp.com/iframe", {
+      waitUntil: "networkidle0",
+    });
+  });
+  // metrics, error, requestfailed, workercreated, workerdestroyed events are not covered
 });
