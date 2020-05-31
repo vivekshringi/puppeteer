@@ -22,7 +22,7 @@ afterEach(async () => {
   }
 });
 
-describe("Example Test Scenarios", () => {
+describe.only("Example Test Scenarios", () => {
   test("check if page title is correct", async () => {
     const title = await page.title();
     expect(title).toEqual("The Internet");
@@ -73,11 +73,9 @@ describe("Example Test Scenarios", () => {
   test("check $$ selector use", async () => {
     await page.goto("https://the-internet.herokuapp.com");
     const elementHandles = await page.$$("li>a");
-    console.log(elementHandles.length);
-    for(let i =0; i<elementHandles.length;i++){
-    const value = await elementHandles[i]?.getProperty("href");
-    const href = await value?.jsonValue();
-    console.log(href);
-    }
+    await elementHandles[1].click();
+    await page.waitForNavigation();
+    const a = await page.url();
+    expect(a).toEqual('https://the-internet.herokuapp.com/add_remove_elements/');
   });
 });
