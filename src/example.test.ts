@@ -59,7 +59,7 @@ describe.only("Example Test Scenarios", () => {
     expect(dimensions).toEqual(viewport);
   });
 
-  test("check $ selector use", async () => {
+  test("check page.$ selector use", async () => {
     await page.goto("https://the-internet.herokuapp.com");
     const elementHandle = await page.$("h1");
     const propertyDetails = await elementHandle?.getProperty("innerText");
@@ -70,12 +70,32 @@ describe.only("Example Test Scenarios", () => {
     expect(location).toEqual({ x: 155, y: 40.796875, width: 970, height: 61 });
   });
 
-  test("check $$ selector use", async () => {
+  test("check page.$$ selector use", async () => {
     await page.goto("https://the-internet.herokuapp.com");
     const elementHandles = await page.$$("li>a");
     await elementHandles[1].click();
     await page.waitForNavigation();
     const a = await page.url();
     expect(a).toEqual('https://the-internet.herokuapp.com/add_remove_elements/');
+  });
+
+  test("check page.eval$$ selector use", async () => {
+    await page.goto("https://the-internet.herokuapp.com");
+    const hrefs = await page.$$eval('li>a', elements => elements.map(element => element.getAttribute('href')));
+    console.log(hrefs);
+  });
+
+  test("check page.eval$ selector use", async () => {
+    await page.goto("https://the-internet.herokuapp.com");
+    const style = await page.$eval('a>img', element => element.getAttribute('style'));
+    console.log(style);
+  });
+
+  test("check page.$x use", async () => {
+    await page.goto("https://the-internet.herokuapp.com");
+    const element = await page.$x('//h1');//use of xpath instead of selectors
+    const text = await element[0].getProperty('textContent');
+    const json = await text.jsonValue();
+    console.log(json);
   });
 });
