@@ -22,7 +22,7 @@ afterEach(async () => {
   }
 });
 
-describe.only("Example Test Scenarios", () => {
+describe("Example Test Scenarios", () => {
   test("check if page title is correct", async () => {
     const title = await page.title();
     expect(title).toEqual("The Internet");
