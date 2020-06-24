@@ -64,9 +64,28 @@ describe("browser specific scenario", () => {
       url: "https://the-internet.herokuapp.com/",
       name: "dummy name",
     });
-    const cookie = await page.cookies();
+    let cookie = await page.cookies();
     expect(cookie).toEqual(
       expect.arrayContaining([
+        {
+          domain: "the-internet.herokuapp.com",
+          expires: 1600321201,
+          httpOnly: false,
+          name: "dummy name",
+          path: "/",
+          secure: true,
+          session: false,
+          size: 21,
+          value: "dummy value",
+        },
+      ])
+    );
+    await page.deleteCookie({
+      name: "dummy name"
+    });
+    cookie = await page.cookies();
+    expect(cookie).toEqual(
+      expect.not.arrayContaining([
         {
           domain: "the-internet.herokuapp.com",
           expires: 1600321201,

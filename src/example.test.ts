@@ -150,4 +150,12 @@ describe("Example Test Scenarios", () => {
     const pageContent = await page.content();
     expect(pageContent).toContain('<p>My first paragraph.</p>')
   });
+
+  test("verify emulate the page to iphone 6", async () => {
+    const iPhone = puppeteer.devices['iPhone 6'];
+    await page.emulate(iPhone);
+    await page.goto('https://www.adac.de/',{waitUntil:"networkidle0"});
+    await page.tap('nav+div>span');
+    await page.waitForSelector('div[role=button]>span',{visible:true});
+  });
 });
