@@ -1,4 +1,4 @@
-import puppeteer from "puppeteer";
+import puppeteer, { ElementHandle } from "puppeteer";
 import { openBrowser, openPage, textBySelector } from "./helper";
 
 let browser: puppeteer.Browser;
@@ -76,25 +76,31 @@ describe("Example Test Scenarios", () => {
     await elementHandles[1].click();
     await page.waitForNavigation();
     const a = await page.url();
-    expect(a).toEqual('https://the-internet.herokuapp.com/add_remove_elements/');
+    expect(a).toEqual(
+      "https://the-internet.herokuapp.com/add_remove_elements/"
+    );
   });
 
   test("check page.eval$$ selector use", async () => {
     await page.goto("https://the-internet.herokuapp.com");
-    const hrefs = await page.$$eval('li>a', elements => elements.map(element => element.getAttribute('href')));
+    const hrefs = await page.$$eval("li>a", (elements) =>
+      elements.map((element) => element.getAttribute("href"))
+    );
     console.log(hrefs);
   });
 
   test("check page.eval$ selector use", async () => {
     await page.goto("https://the-internet.herokuapp.com");
-    const style = await page.$eval('a>img', element => element.getAttribute('style'));
+    const style = await page.$eval("a>img", (element) =>
+      element.getAttribute("style")
+    );
     console.log(style);
   });
 
   test("check page.$x use", async () => {
     await page.goto("https://the-internet.herokuapp.com");
-    const element = await page.$x('//h1');//use of xpath instead of selectors
-    const text = await element[0].getProperty('textContent');
+    const element = await page.$x("//h1"); //use of xpath instead of selectors
+    const text = await element[0].getProperty("textContent");
     const json = await text.jsonValue();
     console.log(json);
   });
@@ -103,23 +109,45 @@ describe("Example Test Scenarios", () => {
     var projectDir = process.env.PWD;
     await page.goto(`file:///${projectDir}/src/1.html`);
     await page.addScriptTag({
-      content:"document.getElementById(\"demo\").innerHTML =\"I Love You\";"
-    })
-    const headline = await page.$eval('h1', element => element.textContent);
-    expect(headline).toEqual('I Love You');
-   });
+      content: 'document.getElementById("demo").innerHTML ="I Love You";',
+    });
+    const headline = await page.$eval("h1", (element) => element.textContent);
+    expect(headline).toEqual("I Love You");
+  });
 
-   test("check if adding style works", async () => {
+  test("check if adding style works", async () => {
     var projectDir = process.env.PWD;
     await page.goto(`file:///${projectDir}/src/1.html`);
     await page.addStyleTag({
-      url:`file:///${projectDir}/src/1.css`
-    })
-    const styleObject = await page.evaluate(
-      () => {
-        const headline:any = document.querySelector('h1');
-        return JSON.parse(JSON.stringify(getComputedStyle(headline)));
-      });
-    expect(styleObject.fontSize).toEqual('25px');
-   });
+      url: `file:///${projectDir}/src/1.css`,
+    });
+    const styleObject = await page.evaluate(() => {
+      const headline: any = document.querySelector("h1");
+      return JSON.parse(JSON.stringify(getComputedStyle(headline)));
+    });
+    expect(styleObject.fontSize).toEqual("25px");
+  });
+
+  test("check if click work", async () => {
+    await page.goto("https://the-internet.herokuapp.com",{waitUntil:"networkidle0"});
+    const [response] = await Promise.all([
+      page.waitForNavigation(), // The promise resolves after navigation has finished
+      page.click('li>a[href*="add_remove_elements"]')
+    ]);
+    await page.waitForSelector('#content>h3', {visible:true});
+    const header = await page.$eval('#content>h3',el => el.innerHTML);
+    expect(header).toEqual('Add/Remove Elements');
+    const addElement = await page.$('button[onclick="addElement()"]');
+    addElement?.click();
+    await page.waitForSelector('button[onclick="deleteElement()"]', {visible:true});
+    const count = await page.$$eval('button[onclick="deleteElement()"]',elements=>elements.length);
+    expect(count).toEqual(1);
+  });
+
+  test("verify if page content can be fetched", async () => {
+    var projectDir = process.env.PWD;
+    await page.goto(`file:///${projectDir}/src/1.html`);
+    const pageContent = await page.content();
+    expect(pageContent).toContain('<p>My first paragraph.</p>')
+  });
 });
