@@ -129,18 +129,25 @@ describe("Example Test Scenarios", () => {
   });
 
   test("check if click work", async () => {
-    await page.goto("https://the-internet.herokuapp.com",{waitUntil:"networkidle0"});
+    await page.goto("https://the-internet.herokuapp.com", {
+      waitUntil: "networkidle0",
+    });
     const [response] = await Promise.all([
       page.waitForNavigation(), // The promise resolves after navigation has finished
-      page.click('li>a[href*="add_remove_elements"]')
+      page.click('li>a[href*="add_remove_elements"]'),
     ]);
-    await page.waitForSelector('#content>h3', {visible:true});
-    const header = await page.$eval('#content>h3',el => el.innerHTML);
-    expect(header).toEqual('Add/Remove Elements');
+    await page.waitForSelector("#content>h3", { visible: true });
+    const header = await page.$eval("#content>h3", (el) => el.innerHTML);
+    expect(header).toEqual("Add/Remove Elements");
     const addElement = await page.$('button[onclick="addElement()"]');
     addElement?.click();
-    await page.waitForSelector('button[onclick="deleteElement()"]', {visible:true});
-    const count = await page.$$eval('button[onclick="deleteElement()"]',elements=>elements.length);
+    await page.waitForSelector('button[onclick="deleteElement()"]', {
+      visible: true,
+    });
+    const count = await page.$$eval(
+      'button[onclick="deleteElement()"]',
+      (elements) => elements.length
+    );
     expect(count).toEqual(1);
   });
 
@@ -148,14 +155,47 @@ describe("Example Test Scenarios", () => {
     var projectDir = process.env.PWD;
     await page.goto(`file:///${projectDir}/src/1.html`);
     const pageContent = await page.content();
-    expect(pageContent).toContain('<p>My first paragraph.</p>')
+    expect(pageContent).toContain("<p>My first paragraph.</p>");
   });
 
   test("verify emulate the page to iphone 6", async () => {
-    const iPhone = puppeteer.devices['iPhone 6'];
+    const iPhone = puppeteer.devices["iPhone 6"];
     await page.emulate(iPhone);
-    await page.goto('https://www.adac.de/',{waitUntil:"networkidle0"});
-    await page.tap('nav+div>span');
-    await page.waitForSelector('div[role=button]>span',{visible:true});
+    await page.goto("https://www.adac.de/", { waitUntil: "networkidle0" });
+    await page.tap("nav+div>span");
+    await page.waitForSelector("div[role=button]>span", { visible: true });
+  });
+
+  test("verify wait untill page url is correct", async () => {
+    await page.goto("https://the-internet.herokuapp.com", {
+      waitUntil: "networkidle0",
+    });
+    const ab = await page.$("li>a");
+    await ab?.click();
+    await page.waitForFunction(
+      'window.location.href=="https://the-internet.herokuapp.com/abtefsdst"'
+    );
+  });
+
+  test("verify wait for navigation and wait for", async () => {
+    await page.goto("https://the-internet.herokuapp.com", {
+      waitUntil: "networkidle0",
+    });
+    const ab = await page.$("li>a");
+    await ab?.click();
+    await page.waitForNavigation({ timeout: 5000, waitUntil: "networkidle0" });
+    const currentURL = await page.url();
+    expect(currentURL).toEqual("https://the-internet.herokuapp.com/abtest");
+    await page.goBack();
+    const [response] = await Promise.all([
+      page.waitForNavigation(),
+      page.click("li>a"),
+    ]);
+    const selector = "div.example";
+    await page.waitFor(
+      (selector) => document.querySelector(selector),
+      {},
+      selector
+    );
   });
 });
