@@ -173,7 +173,7 @@ describe("Example Test Scenarios", () => {
     const ab = await page.$("li>a");
     await ab?.click();
     await page.waitForFunction(
-      'window.location.href=="https://the-internet.herokuapp.com/abtefsdst"'
+      'window.location.href=="https://the-internet.herokuapp.com/abtest"'
     );
   });
 
