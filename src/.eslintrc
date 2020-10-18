@@ -1,0 +1,12 @@
+{
+    "parserOptions":{
+        "ecmaVersion":2019,
+        "sourceType": "script",
+        "ecmaFeatures": {
+            "ts":true
+        }
+    },
+    "rules": {
+        "valid-typeof":"error"
+    }
+}

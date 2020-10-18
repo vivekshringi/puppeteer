@@ -1,10 +1,9 @@
-import puppeteer, { ElementHandle } from "puppeteer";
+import puppeteer from "puppeteer";
 import { openBrowser, openPage, textBySelector } from "./helper";
 
 let browser: puppeteer.Browser;
 let page: puppeteer.Page;
-const pageName = "/";
-let viewport = {
+const viewport = {
   width: 1280,
   height: 980,
   deviceScaleFactor: 1,
@@ -12,7 +11,7 @@ let viewport = {
 
 beforeEach(async () => {
   browser = await openBrowser();
-  page = await openPage(browser, pageName);
+  page = await openPage(browser);
   await page.setViewport(viewport);
 });
 
@@ -106,7 +105,7 @@ describe("Example Test Scenarios", () => {
   });
 
   test("check if adding script tag works", async () => {
-    var projectDir = process.env.PWD;
+    const projectDir = process.env.PWD;
     await page.goto(`file:///${projectDir}/src/1.html`);
     await page.addScriptTag({
       content: 'document.getElementById("demo").innerHTML ="I Love You";',
@@ -116,12 +115,13 @@ describe("Example Test Scenarios", () => {
   });
 
   test("check if adding style works", async () => {
-    var projectDir = process.env.PWD;
+    const projectDir = process.env.PWD;
     await page.goto(`file:///${projectDir}/src/1.html`);
     await page.addStyleTag({
       url: `file:///${projectDir}/src/1.css`,
     });
     const styleObject = await page.evaluate(() => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const headline: any = document.querySelector("h1");
       return JSON.parse(JSON.stringify(getComputedStyle(headline)));
     });
@@ -132,7 +132,7 @@ describe("Example Test Scenarios", () => {
     await page.goto("https://the-internet.herokuapp.com", {
       waitUntil: "networkidle0",
     });
-    const [response] = await Promise.all([
+    await Promise.all([
       page.waitForNavigation(), // The promise resolves after navigation has finished
       page.click('li>a[href*="add_remove_elements"]'),
     ]);
@@ -152,7 +152,7 @@ describe("Example Test Scenarios", () => {
   });
 
   test("verify if page content can be fetched", async () => {
-    var projectDir = process.env.PWD;
+    const projectDir = process.env.PWD;
     await page.goto(`file:///${projectDir}/src/1.html`);
     const pageContent = await page.content();
     expect(pageContent).toContain("<p>My first paragraph.</p>");
@@ -187,12 +187,9 @@ describe("Example Test Scenarios", () => {
     const currentURL = await page.url();
     expect(currentURL).toEqual("https://the-internet.herokuapp.com/abtest");
     await page.goBack();
-    const [response] = await Promise.all([
-      page.waitForNavigation(),
-      page.click("li>a"),
-    ]);
+    await Promise.all([page.waitForNavigation(), page.click("li>a")]);
     const selector = "div.example";
-    await page.waitFor(
+    await page.waitForFunction(
       (selector) => document.querySelector(selector),
       {},
       selector

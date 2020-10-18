@@ -1,4 +1,4 @@
-import puppeteer, { Browser } from "puppeteer";
+import puppeteer from "puppeteer";
 let page: puppeteer.Page;
 let browser: puppeteer.Browser;
 let disconnectFlag = false;
@@ -9,11 +9,9 @@ let targetDestroyedFlag = false;
 beforeEach(async () => {
   browser = await puppeteer.launch();
 });
-
 afterEach(async () => {
   await browser.close();
 });
-
 describe("browser specific scenario", () => {
   test("Verify if browser instance works and events can be tracked", async () => {
     // Store the endpoint to be able to reconnect to Chromium
@@ -60,7 +58,6 @@ describe("browser specific scenario", () => {
     });
     await page.setCookie({
       value: "dummy value",
-      expires: 1600321201,
       url: "https://the-internet.herokuapp.com/",
       name: "dummy name",
     });
@@ -69,19 +66,19 @@ describe("browser specific scenario", () => {
       expect.arrayContaining([
         {
           domain: "the-internet.herokuapp.com",
-          expires: 1600321201,
+          expires: -1,
           httpOnly: false,
           name: "dummy name",
           path: "/",
           secure: true,
-          session: false,
+          session: true,
           size: 21,
           value: "dummy value",
         },
       ])
     );
     await page.deleteCookie({
-      name: "dummy name"
+      name: "dummy name",
     });
     cookie = await page.cookies();
     expect(cookie).toEqual(

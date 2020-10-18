@@ -1,5 +1,5 @@
 import puppeteer, { ElementHandle } from "puppeteer";
-export let ENV_URL = "https://the-internet.herokuapp.com/";
+export const ENV_URL = "https://the-internet.herokuapp.com/";
 
 export async function openBrowser(): Promise<puppeteer.Browser> {
   return puppeteer.launch({
@@ -7,7 +7,7 @@ export async function openBrowser(): Promise<puppeteer.Browser> {
       width: 1920,
       height: 1080,
     },
-    headless: true,
+    headless: false,
     args: [
       "--disable-dev-shm-usage",
       "--no-sandbox",
@@ -20,14 +20,13 @@ export async function openBrowser(): Promise<puppeteer.Browser> {
 }
 
 export async function openPage(
-  browser: puppeteer.Browser,
-  pageName: string
+  browser: puppeteer.Browser
 ): Promise<puppeteer.Page> {
-  const page = (await browser.pages())[0];
+  const [page] = await browser.pages();
   await page.setCacheEnabled(false);
-  page.setDefaultTimeout(20000);
+  page.setDefaultTimeout(10000);
   await page.goto(ENV_URL, {
-    waitUntil: "networkidle2",
+    waitUntil: "networkidle0",
   });
   return page;
 }
@@ -36,6 +35,7 @@ export async function textBySelector(
   page: puppeteer.Page,
   selector: string
 ): Promise<string> {
+  await page.waitForSelector(selector);
   const element = await page.$(selector);
   if (!element) {
     throw new Error(`No element at '${selector}' found`);
@@ -47,8 +47,9 @@ export async function textBySelector(
 export async function selectorByXPath(
   page: puppeteer.Page,
   selector: string
-): Promise<object> {
-  const element = await page.waitForXPath(selector);
+): Promise<puppeteer.ElementHandle<Element>[]> {
+  await page.waitForXPath(selector);
+  const element = await page.$x(selector);
   if (!element) {
     throw new Error(`No element at '${selector}' found`);
   }

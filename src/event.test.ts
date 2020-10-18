@@ -1,12 +1,6 @@
-import puppeteer, { Browser } from "puppeteer";
+import puppeteer from "puppeteer";
 import { textBySelector } from "./helper";
-let page: puppeteer.Page;
 let browser: puppeteer.Browser;
-let disconnectFlag = false;
-let targetChangedFlag = false;
-let targetCreatedFlag = false;
-let targetDestroyedFlag = false;
-
 beforeEach(async () => {
   browser = await puppeteer.launch({ headless: true });
 });
@@ -91,9 +85,9 @@ describe("Scenarios to test events", () => {
 
 describe("All event based scenarios", () => {
   test("Verify the close event", async () => {
-    let page = (await browser.pages())[0];
+    const page = (await browser.pages())[0];
     let pageIsClosed = false;
-    page.on("close", (result) => {
+    page.on("close", () => {
       pageIsClosed = true;
     });
     await page.close();
@@ -102,7 +96,7 @@ describe("All event based scenarios", () => {
 
   test("Verify the console event", async () => {
     let consoleflag = false;
-    let page = (await browser.pages())[0];
+    const page = (await browser.pages())[0];
     page.on("console", (msg) => {
       consoleflag = true;
       for (let i = 0; i < msg.args().length; ++i)
@@ -117,9 +111,9 @@ describe("All event based scenarios", () => {
   });
 
   test("Verify the domcontent is loaded", async () => {
-    let page = (await browser.pages())[0];
+    const page = (await browser.pages())[0];
     let domISLoaded = false;
-    page.on("domcontentloaded", (result) => {
+    page.on("domcontentloaded", () => {
       domISLoaded = true;
     });
     await page.goto("https://the-internet.herokuapp.com/", {
@@ -129,7 +123,7 @@ describe("All event based scenarios", () => {
   });
 
   test("Verify tracking page error event", async () => {
-    let page = (await browser.pages())[0];
+    const page = (await browser.pages())[0];
     page.once("pageerror", (result) => {
       expect(result.name).toEqual("Error");
       expect(result.message).toContain(
@@ -142,12 +136,12 @@ describe("All event based scenarios", () => {
   });
 
   test("Verify tracking requests and responses", async () => {
-    let page = (await browser.pages())[0];
-    page.once("request", (request: any) => {
+    const page = (await browser.pages())[0];
+    page.once("request", (request) => {
       console.log(request);
     });
 
-    page.once("response", (response: any) => {
+    page.once("response", (response) => {
       console.log(response);
     });
     await page.goto("https://the-internet.herokuapp.com/status_codes/200", {
@@ -156,7 +150,7 @@ describe("All event based scenarios", () => {
   });
 
   test("Verify tracking finished request", async () => {
-    let page = (await browser.pages())[0];
+    const page = (await browser.pages())[0];
     page.once("requestfinished", (request) => {
       console.log("request finished");
       console.log(request);
@@ -167,7 +161,7 @@ describe("All event based scenarios", () => {
   });
 
   test("Verify tracking if frameattached request", async () => {
-    let page = (await browser.pages())[0];
+    const page = (await browser.pages())[0];
     page.on("frameattached", (result) => {
       console.log("frame is attached");
       console.log(result.parentFrame());
