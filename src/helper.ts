@@ -7,7 +7,7 @@ export async function openBrowser(): Promise<puppeteer.Browser> {
       width: 1920,
       height: 1080,
     },
-    headless: false,
+    headless: true,
     args: [
       "--disable-dev-shm-usage",
       "--no-sandbox",
