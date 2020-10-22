@@ -1,17 +1,17 @@
 import puppeteer from "puppeteer";
 import { textBySelector } from "./helper";
 let browser: puppeteer.Browser;
-beforeEach(async () => {
+beforeAll(async () => {
   browser = await puppeteer.launch({ headless: true });
 });
 
-afterEach(async () => {
+afterAll(async () => {
   await browser.close();
 });
 
 describe("Scenarios to test events", () => {
   test("Verify opening multiple tabs", async () => {
-    let page = (await browser.pages())[0];
+    let [page] = await browser.pages();
     await page.goto("http://example.com");
     page = await browser.newPage();
     await page.goto("https://the-internet.herokuapp.com/");
@@ -22,7 +22,7 @@ describe("Scenarios to test events", () => {
 
   test("Verify load event is triggered on loading", async () => {
     let pageLoadedFlag = false;
-    const page = (await browser.pages())[0];
+    const [page] = await browser.pages();
     page.once("load", () => {
       pageLoadedFlag = true;
     });
@@ -32,7 +32,7 @@ describe("Scenarios to test events", () => {
 
   test("Verify dialog event is triggered on js alert", async () => {
     let dialogFlag = false;
-    const page = (await browser.pages())[0];
+    const [page] = await browser.pages();
     page.on("dialog", (dialog) => {
       dialogFlag = true;
       dialog.accept();
@@ -46,7 +46,7 @@ describe("Scenarios to test events", () => {
 
   test("Verify confirming the js confirm ", async () => {
     let dialogFlag = false;
-    const page = (await browser.pages())[0];
+    const [page] = await browser.pages();
     page.on("dialog", async (dialog) => {
       await dialog.accept().then(() => (dialogFlag = true));
     });
@@ -57,7 +57,7 @@ describe("Scenarios to test events", () => {
 
   test("Verify cancel the js confirm message ", async () => {
     let dialogCancelFlag = false;
-    const page = (await browser.pages())[0];
+    const [page] = await browser.pages();
     page.on("dialog", async (dialog) => {
       await dialog.dismiss().then(() => (dialogCancelFlag = true));
       expect(dialog.type()).toEqual("confirm");
@@ -96,7 +96,7 @@ describe("All event based scenarios", () => {
 
   test("Verify the console event", async () => {
     let consoleflag = false;
-    const page = (await browser.pages())[0];
+    const [page] = await browser.pages();
     page.on("console", (msg) => {
       consoleflag = true;
       for (let i = 0; i < msg.args().length; ++i)
@@ -150,7 +150,7 @@ describe("All event based scenarios", () => {
   });
 
   test("Verify tracking finished request", async () => {
-    const page = (await browser.pages())[0];
+    const [page] = await browser.pages();
     page.once("requestfinished", (request) => {
       console.log("request finished");
       console.log(request);
@@ -161,7 +161,7 @@ describe("All event based scenarios", () => {
   });
 
   test("Verify tracking if frameattached request", async () => {
-    const page = (await browser.pages())[0];
+    const [page] = await browser.pages();
     page.on("frameattached", (result) => {
       console.log("frame is attached");
       console.log(result.parentFrame());

@@ -9,13 +9,13 @@ const viewport = {
   deviceScaleFactor: 1,
 };
 
-beforeEach(async () => {
+beforeAll(async () => {
   browser = await openBrowser();
   page = await openPage(browser);
   await page.setViewport(viewport);
 });
 
-afterEach(async () => {
+afterAll(async () => {
   if (browser) {
     browser.close();
   }
@@ -39,6 +39,7 @@ describe("Example Test Scenarios", () => {
   });
 
   test("check if basic authentication works using page.authenticate  ", async () => {
+    await page.goBack();
     await page.authenticate({ username: "admin", password: "admin" });
     await page.goto((await page.url()) + "/basic_auth");
     const successMessage = await textBySelector(page, ".example p");
@@ -58,7 +59,7 @@ describe("Example Test Scenarios", () => {
     expect(dimensions).toEqual(viewport);
   });
 
-  test("check page.$ selector use", async () => {
+  test("check page.$ selector,", async () => {
     await page.goto("https://the-internet.herokuapp.com");
     const elementHandle = await page.$("h1");
     const propertyDetails = await elementHandle?.getProperty("innerText");
@@ -67,6 +68,11 @@ describe("Example Test Scenarios", () => {
     const innerText = await propertyDetails?.jsonValue();
     expect(innerText).toEqual("Welcome to the-internet");
     expect(location).toEqual({ x: 155, y: 40.796875, width: 970, height: 61 });
+    await page.$("h1").then(async (s) => {
+      expect(await (await s?.getProperty("innerText"))?.jsonValue()).toEqual(
+        "Welcome to the-internet"
+      );
+    });
   });
 
   test("check page.$$ selector use", async () => {
@@ -85,7 +91,9 @@ describe("Example Test Scenarios", () => {
     const hrefs = await page.$$eval("li>a", (elements) =>
       elements.map((element) => element.getAttribute("href"))
     );
-    console.log(hrefs);
+    hrefs.forEach((a) => {
+      expect(a).toContain("/");
+    });
   });
 
   test("check page.eval$ selector use", async () => {
@@ -93,7 +101,8 @@ describe("Example Test Scenarios", () => {
     const style = await page.$eval("a>img", (element) =>
       element.getAttribute("style")
     );
-    console.log(style);
+    expect(style).toContain("absolute");
+    expect(style).toContain("top: 0");
   });
 
   test("check page.$x use", async () => {
@@ -101,7 +110,7 @@ describe("Example Test Scenarios", () => {
     const element = await page.$x("//h1"); //use of xpath instead of selectors
     const text = await element[0].getProperty("textContent");
     const json = await text.jsonValue();
-    console.log(json);
+    expect(json).toEqual("Welcome to the-internet");
   });
 
   test("check if adding script tag works", async () => {

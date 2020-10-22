@@ -14,7 +14,7 @@
   },
   "scripts": {
     "test": "jest --color",
-    "test-event": "jest event.test --color",
+    "test-event": "jest example.test --color",
     "lint": "eslint --ext .ts --ignore-path .gitignore .",
     "format": "prettier --ignore-path .gitignore --write \"**/*.+(ts|css|html)\"",
     "build": "tsc -b"
