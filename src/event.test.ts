@@ -1,11 +1,11 @@
 import puppeteer from "puppeteer";
 import { textBySelector } from "./helper";
 let browser: puppeteer.Browser;
-beforeAll(async () => {
+beforeEach(async () => {
   browser = await puppeteer.launch({ headless: true });
 });
 
-afterAll(async () => {
+afterEach(async () => {
   await browser.close();
 });
 
@@ -70,7 +70,7 @@ describe("Scenarios to test events", () => {
 
   test("Verify confirming the js prompt message ", async () => {
     let dialogPromptFlag = false;
-    const page = (await browser.pages())[0];
+    const [page] = await browser.pages();
     page.on("dialog", async (dialog) => {
       await dialog.accept("Hello").then(() => (dialogPromptFlag = true));
       expect(dialog.type()).toEqual("prompt");
@@ -85,7 +85,7 @@ describe("Scenarios to test events", () => {
 
 describe("All event based scenarios", () => {
   test("Verify the close event", async () => {
-    const page = (await browser.pages())[0];
+    const [page] = await browser.pages();
     let pageIsClosed = false;
     page.on("close", () => {
       pageIsClosed = true;
@@ -111,7 +111,7 @@ describe("All event based scenarios", () => {
   });
 
   test("Verify the domcontent is loaded", async () => {
-    const page = (await browser.pages())[0];
+    const [page] = await browser.pages();
     let domISLoaded = false;
     page.on("domcontentloaded", () => {
       domISLoaded = true;
@@ -136,7 +136,7 @@ describe("All event based scenarios", () => {
   });
 
   test("Verify tracking requests and responses", async () => {
-    const page = (await browser.pages())[0];
+    const [page] = await browser.pages();
     page.once("request", (request) => {
       console.log(request);
     });
