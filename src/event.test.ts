@@ -123,7 +123,7 @@ describe("All event based scenarios", () => {
   });
 
   test("Verify tracking page error event", async () => {
-    const page = (await browser.pages())[0];
+    const [page] = await browser.pages();
     page.once("pageerror", (result) => {
       expect(result.name).toEqual("Error");
       expect(result.message).toContain(
