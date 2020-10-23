@@ -1,6 +1,9 @@
 name: puppeteer run
 on:
-  push
+  pull_request:
+    branches:
+    - master
+  push:
     branches:
     - master
 jobs:
@@ -23,7 +26,7 @@ jobs:
         node-version: '12.x'
     - run: npm run format
   build:
-    needs: lint, prettier
+    needs: [lint, prettier]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
