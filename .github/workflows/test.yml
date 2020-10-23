@@ -1,13 +1,46 @@
 name: puppeteer run
 on:
-  pull_request:
-    branches:
-    - master
-  push:
+  [push, pull_request]:
     branches:
     - master
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: '12.x'
+    - run: npm run lint
+  prettier:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: '12.x'
+    - run: npm run format
   build:
+    needs: lint, prettier
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: '12.x'
+    - run: npm install
+    - run: npm build
+    - uses: actions/upload-artifact@v2
+      with:
+        name: screenshots
+        path: /home/runner/work/puppeteer/puppeteer/*.jpg
+      env:
+        CI: true  
+  test:
+    needs: build
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -22,4 +55,7 @@ jobs:
         name: screenshots
         path: /home/runner/work/puppeteer/puppeteer/*.jpg
       env:
-        CI: true
+        CI: true  
+
+
+
