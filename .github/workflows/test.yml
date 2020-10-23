@@ -2,28 +2,24 @@ name: puppeteer run
 on:
   pull_request:
     branches:
-      - master
+    - master
   push:
     branches:
-      - master
+    - master
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Repo checkout
-      - uses: actions/checkout@v2
-      - name: Use Node V 12.x
-        uses: actions/setup-node@v1
-        with:
-          node-version: "12.x"
-      - run: npm install
-      - run: npm run lint
-      - run: npm run format
-      - run: npm build
-      - run: npm test
-      - uses: actions/upload-artifact@v2
-        with:
-          name: screenshots
-          path: /home/runner/work/puppeteer/puppeteer/*.jpg
-        env:
-          CI: true
+    - uses: actions/checkout@v2
+    - name: Use Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: '12.x'
+    - run: npm install
+    - run: npm test
+    - uses: actions/upload-artifact@v2
+      with:
+        name: screenshots
+        path: /home/runner/work/puppeteer/puppeteer/*.jpg
+      env:
+        CI: true
