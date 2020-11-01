@@ -8,13 +8,14 @@
     "@types/puppeteer": "^3.0.0",
     "eslint": "^7.11.0",
     "jest": "^26.0.1",
-    "puppeteer": "^5.3.0",
+    "puppeteer": "^5.4.0",
     "ts-jest": "^26.0.0",
     "typescript": "^3.9.3"
   },
   "scripts": {
     "test": "jest --color",
-    "test-event": "jest example.test --color",
+    "test-event": "jest event.test --color",
+    "test-internet": "jest internet.test.ts --color",
     "lint": "eslint --ext .ts --ignore-path .gitignore .",
     "format": "prettier --ignore-path .gitignore --write \"**/*.+(ts|css|html)\"",
     "build": "tsc -b"
