@@ -96,7 +96,7 @@ describe("The Internet Scenarios", () => {
       });
     });
 
-    test("Verify if link is opened in new tab", async () => {
+    test("Verify github link is correct", async () => {
       await page
         .waitForSelector(e.forkElement, { visible: true })
         .then(async (el) =>
