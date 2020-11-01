@@ -77,9 +77,9 @@ describe("The Internet Scenarios", () => {
 
     test("Verify element size and dimensions", async () => {
       const elemetSize = await (await page.$(e.addButton))?.boundingBox();
-      expect(elemetSize?.height).toEqual(45);
-      expect(elemetSize?.width).toEqual(147.453125);
-      expect(elemetSize?.y).toEqual(103.890625);
+      expect(elemetSize?.height).toContain(45);
+      expect(elemetSize?.width).toContain(147);
+      expect(elemetSize?.y).toContain(103);
       expect(elemetSize?.x).toEqual(15);
     });
 
