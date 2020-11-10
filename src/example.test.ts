@@ -1,5 +1,5 @@
 import puppeteer from "puppeteer";
-import { openBrowser, openPage, textBySelector } from "./helper";
+import { openBrowser, openPage} from "./helper";
 
 let browser: puppeteer.Browser;
 let page: puppeteer.Page;
@@ -27,26 +27,7 @@ describe("Example Test Scenarios", () => {
     expect(title).toEqual("The Internet");
   });
 
-  test("check if basic authentication works", async () => {
-    await page.setExtraHTTPHeaders({
-      Authorization: `Basic ${Buffer.from("admin:admin").toString("base64")}`,
-    });
-    await page.goto((await page.url()) + "/basic_auth");
-    const successMessage = await textBySelector(page, ".example p");
-    expect(successMessage.trim()).toEqual(
-      "Congratulations! You must have the proper credentials."
-    );
-  });
 
-  test("check if basic authentication works using page.authenticate  ", async () => {
-    await page.goBack();
-    await page.authenticate({ username: "admin", password: "admin" });
-    await page.goto((await page.url()) + "/basic_auth");
-    const successMessage = await textBySelector(page, ".example p");
-    expect(successMessage.trim()).toEqual(
-      "Congratulations! You must have the proper credentials."
-    );
-  });
 
   test("check if window width and height is correct on opening", async () => {
     const dimensions = await page.evaluate(() => {

@@ -29,7 +29,25 @@ afterAll(async () => {
 });
 
 describe("The Internet Scenarios", () => {
-  describe("The Add/Remove element scenarios", () => {
+  describe("Broken image scenarios", () => {
+    beforeEach(async () => {
+      await page.goto(`${targetURL}broken_images`, {
+        waitUntil: "networkidle0",
+      });
+    });
+    
+    test("verify broken images ", async () => {
+      page.on("response", (response) => {
+          if(response.status()==404){
+            expect([`${targetURL}asdf.jpg`,`${targetURL}hjkl.jpg`,`${targetURL}favicon.ico`].includes(response.url())).toBeTruthy()
+          }
+      });
+        await page.goto(`${targetURL}broken_images`, {
+          waitUntil: "networkidle0",
+        });
+    });
+  });
+  describe("Add/Remove element scenarios", () => {
     beforeAll(async () => {
       await page.goto(`${targetURL}add_remove_elements/`, {
         waitUntil: "networkidle0",
@@ -141,7 +159,7 @@ describe("The Internet Scenarios", () => {
     });
 
     const login = async () => {
-      await page.goto(`${targetURL}/basic_auth`, { waitUntil: "networkidle0" });
+      await page.goto(`${targetURL}basic_auth`, { waitUntil: "networkidle0" });
       const successMessage = await page.$eval(
         e.successMessage,
         (el) => el.textContent
